@@ -2,9 +2,6 @@
     "folders": [
       {
         "path": "."
-      },
-      {
-        "path": "../../cs220-game-template"
       }
     ],
     "settings": {
