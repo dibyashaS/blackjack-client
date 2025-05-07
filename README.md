@@ -24,6 +24,9 @@ Here is the REST API:
 
 Remember that the {id} in the URL is the session id of the game you are playing.
 
+The username and password are in the file `accounts.txt` with the assignment on Google Classroom. This is NOT your email password. The level of security we need here is really low; basically just a simple way for me to keep your sessions separate on the server, make sure that each person's client can connect, and ensure that your projects don't get in each other's way.
+
+## Starting and playing a game
 So this URL as a post would start a new session:
 
 ```
