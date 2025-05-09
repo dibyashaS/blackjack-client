@@ -33,8 +33,3 @@ tasks.register('runGUI', JavaExec) {
     mainClass.set('client.BlackjackGUI')
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
