@@ -99,13 +99,13 @@ After a game is resolved (i.e. the player has won, lost, or pushed), the JSON fi
 The response from the server a **phase** variable that tells you what phase of the game you are in. Possible values are:
 - `BETTING`
 - `PLAYER_TURN`
-- `DEALER_TURN`
 - `RESOLVED`
 
 `RESOLVED` means the game is over and there is an outcome.
 
 Possible values for `outcome` are:
 - `PLAYER_WINS`
+- `PLAYER_BLACKJACK`
 - `DEALER_WINS`
 - `PUSH`
 
