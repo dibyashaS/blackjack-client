@@ -1,6 +1,5 @@
 package client;
 
-import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,13 +14,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -33,12 +30,16 @@ public class BlackjackGUI extends JFrame {
     private JButton standButton;
     
 
-    private String BASE_URL = "http://localhost:8080/api/blackjack";
-    private String USERNAME = "jspacco";
-    private String PASSWORD = "12347";
+    private String BASE_URL = "http://euclid.knox.edu:8080/api/blackjack";
+    private String USERNAME = "dsharma";
+    private String PASSWORD = "95928b";
     private ClientConnecter clientConnecter;
 
     private CardPanel cardPanel;
+    private int playerSum=0;
+    private int playerAceCount=0;
+    private int dealerSum=0;
+    private int dealerAceCount=0; //To ensure our sum does not exceed 21 for cards
     private Map<Card, ImageIcon> cardImages;
     private Random random = new Random();
     private UUID sessionId;
@@ -58,17 +59,34 @@ public class BlackjackGUI extends JFrame {
         hitButton.addActionListener(e -> {
             System.out.println("Hit button clicked");
             List<Card> cards = List.of(Card.values());
+            Card c=(cards.get(random.nextInt(cards.size())));
             cardPanel.addPlayerCard(cards.get(random.nextInt(cards.size())));
+            //To update the sum
+            playerSum+=c.getValue();
+            if (c.isAce()){
+                playerAceCount++;
+            }
             repaint(); 
+            //Logic to block out hit and stand button after exceeding 21
+            if (reducePlayerAce()>21){
+                hitButton.setEnabled(false);
+            }
         });
         standButton.addActionListener(e -> {
             System.out.println("Stand button clicked");
             List<Card> cards = List.of(Card.values());
+            Card d=(cards.get(random.nextInt(cards.size())));
             cardPanel.addDealerCard(cards.get(random.nextInt(cards.size())));
+            //To update dealer sum
+            dealerSum+=d.getValue();
+            if(d.isAce()){
+                dealerAceCount++;
+            }
             repaint(); 
+            if (reduceDealerAce()>21){
+                standButton.setEnabled(false);
+            }
         });
-
-        
 
         // client connecter to make API calls on the server
         clientConnecter = new ClientConnecter(BASE_URL, USERNAME, PASSWORD);
@@ -78,6 +96,7 @@ public class BlackjackGUI extends JFrame {
         
         addMenuBar();
         //TODO: keyboard shortcuts
+
         //TODO: mouse events
     }
 
@@ -168,5 +187,19 @@ public class BlackjackGUI extends JFrame {
         BlackjackGUI gui = new BlackjackGUI();
         gui.setVisible(true);
     }
-    
+    public int reducePlayerAce(){
+        while(playerSum>21 && playerAceCount>0){
+            playerSum-=10;//cut 10 from balance when sum exceeds 21
+            playerAceCount-=1; //number of ace reduced
+
+        }
+        return playerSum;
+    } 
+    public int reduceDealerAce(){
+        while (dealerSum>21 && dealerAceCount>0){
+            dealerSum-=10;
+            dealerAceCount-=1;
+        }
+        return dealerSum;
+    }
 }

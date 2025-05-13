@@ -3,7 +3,7 @@ package client;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
-//.\gradlew build
+//Run environment: .\gradlew build
 
 public class BlackjackClient {
     private static final String BASE_URL = "http://euclid.knox.edu:8080/api/blackjack";
