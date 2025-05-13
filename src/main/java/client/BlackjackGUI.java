@@ -97,7 +97,7 @@ public class BlackjackGUI extends JFrame {
         addMenuBar();
         //TODO: keyboard shortcuts
 
-        //TODO: mouse events
+        //DONE: mouse events-Complete: Implemented hit and stand button with sum counter functionality
     }
 
     private void addMenuBar()
