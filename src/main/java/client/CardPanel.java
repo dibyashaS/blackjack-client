@@ -1,34 +1,40 @@
 package client;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import java.awt.Color;
-import java.awt.Graphics;
 
 public class CardPanel extends JPanel 
 {
     private static final long serialVersionUID = 1L;
+    //expanding upon GUI
+    private JLabel statusLabel;
+    private JLabel playerValueLabel;
+    private JLabel dealerValueLabel;
+
 
     private JButton hitButton;
     private JButton standButton;
+    private JButton restartButton;
 
     private List<Card> dealerCards = new ArrayList<>();
     private List<Card> playerCards = new ArrayList<>();
     private Map<Card, ImageIcon> cardImages;
     //private Random random;
 
-    public CardPanel(JButton hitButton, JButton standButton, Map<Card, ImageIcon> cardImages)
+    public CardPanel(JButton hitButton, JButton standButton, JButton restartButton, Map<Card, ImageIcon> cardImages)
     {
         this.hitButton = hitButton;
         this.standButton = standButton;
+        this.restartButton=restartButton;
         this.cardImages = cardImages;
 
         // null layout manager is absolute positioning
@@ -54,10 +60,12 @@ public class CardPanel extends JPanel
 
     public void addDealerCard(Card card) {
         dealerCards.add(card);
+        repaint();
     }
 
     public void addPlayerCard(Card card) {
         playerCards.add(card);
+        repaint();
     }
 
     @Override

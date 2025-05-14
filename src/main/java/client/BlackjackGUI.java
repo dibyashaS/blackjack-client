@@ -1,6 +1,9 @@
+//Basic mouse and keyboard control has been implemented in the code! Mousecontrol disables the button when sum exceeds 21, and keyboard control uses "H/h"and "S/s" for hit and stand functionality.
 package client;
 
 import java.awt.Dialog;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -28,7 +31,8 @@ public class BlackjackGUI extends JFrame {
 
     private JButton hitButton;
     private JButton standButton;
-    
+    private JButton restartButton;
+
 
     private String BASE_URL = "http://euclid.knox.edu:8080/api/blackjack";
     private String USERNAME = "dsharma";
@@ -52,8 +56,9 @@ public class BlackjackGUI extends JFrame {
         // it will resize them and add them to the panel
         hitButton = new JButton("Hit");
         standButton = new JButton("Stand");
-        cardPanel = new CardPanel(hitButton, standButton, cardImages);
+        cardPanel = new CardPanel(hitButton, standButton, restartButton, cardImages);
         setContentPane(cardPanel);
+ 
 
         // now set the action listeners for the hit/stand buttons
         hitButton.addActionListener(e -> {
@@ -95,9 +100,31 @@ public class BlackjackGUI extends JFrame {
         setLocationRelativeTo(null);
         
         addMenuBar();
-        //TODO: keyboard shortcuts
-
-        //DONE: mouse events-Complete: Implemented hit and stand button with sum counter functionality
+        addKeyboardControls(); // Add keyboard controls
+    }    private void addKeyboardControls() {
+        // Basic keyboard control
+        KeyListener listener = new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                char key = e.getKeyChar();
+                System.out.println("Key pressed: " + key); // Debug print
+                if (key == 'h' || key == 'H') {
+                    hitButton.doClick();
+                }
+                if (key == 's' || key == 'S') {
+                    standButton.doClick();
+                }
+            }
+            @Override
+            public void keyTyped(KeyEvent e) {} 
+            @Override
+            public void keyReleased(KeyEvent e) {}
+        };
+        
+        // Add the listener and make sure we can receive key events
+        addKeyListener(listener);
+        setFocusable(true);
+        requestFocus();
     }
 
     private void addMenuBar()
@@ -191,9 +218,11 @@ public class BlackjackGUI extends JFrame {
         while(playerSum>21 && playerAceCount>0){
             playerSum-=10;//cut 10 from balance when sum exceeds 21
             playerAceCount-=1; //number of ace reduced
-
         }
-        return playerSum;
+        if (playerSum>21){
+            System.out.println("You lose!");
+        }
+            return playerSum;
     } 
     public int reduceDealerAce(){
         while (dealerSum>21 && dealerAceCount>0){
