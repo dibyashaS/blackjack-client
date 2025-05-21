@@ -41,6 +41,21 @@ public class CardPanel extends JPanel
         setLayout(null);
         setBackground(Color.GREEN.darker());
 
+        // Initialize labels
+        statusLabel = new JLabel("Game in Progress");
+        playerValueLabel = new JLabel("Player: 0");
+        dealerValueLabel = new JLabel("Dealer: 0");
+
+        // Position labels
+        statusLabel.setBounds(400, 50, 200, 30);
+        playerValueLabel.setBounds(50, 450, 100, 30);
+        dealerValueLabel.setBounds(50, 50, 100, 30);
+
+        // Add labels to panel
+        add(statusLabel);
+        add(playerValueLabel);
+        add(dealerValueLabel);
+
         //loadCards();
 
         // add a hit and stand button
@@ -50,6 +65,9 @@ public class CardPanel extends JPanel
         
         standButton.setBounds(200, 600, 100, 60);
         add(standButton);
+
+        restartButton.setBounds(350, 600, 100, 60);
+        add(restartButton);
 
     }
 
@@ -65,6 +83,17 @@ public class CardPanel extends JPanel
 
     public void addPlayerCard(Card card) {
         playerCards.add(card);
+        repaint();
+    }
+
+    public void updateScores(int playerScore, int dealerScore) {
+        playerValueLabel.setText("Player: " + playerScore);
+        dealerValueLabel.setText("Dealer: " + dealerScore);
+        repaint();
+    }
+
+    public void updateStatus(String status) {
+        statusLabel.setText(status);
         repaint();
     }
 
@@ -101,3 +130,4 @@ public class CardPanel extends JPanel
     }        
     
 }
+

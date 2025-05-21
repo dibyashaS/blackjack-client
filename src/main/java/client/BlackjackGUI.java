@@ -56,41 +56,78 @@ public class BlackjackGUI extends JFrame {
         // it will resize them and add them to the panel
         hitButton = new JButton("Hit");
         standButton = new JButton("Stand");
+        restartButton = new JButton("Restart");
         cardPanel = new CardPanel(hitButton, standButton, restartButton, cardImages);
         setContentPane(cardPanel);
- 
+
+        // Initial deal
+        dealInitialCards();
+
+        // Add restart button functionality
+        restartButton.addActionListener(e -> {
+            playerSum = 0;
+            playerAceCount = 0;
+            dealerSum = 0;
+            dealerAceCount = 0;
+            hitButton.setEnabled(true);
+            standButton.setEnabled(true);
+            cardPanel.clearCards();
+            cardPanel.updateScores(0, 0);
+            cardPanel.updateStatus("Game in Progress");
+            dealInitialCards();
+            repaint();
+        });
 
         // now set the action listeners for the hit/stand buttons
         hitButton.addActionListener(e -> {
             System.out.println("Hit button clicked");
             List<Card> cards = List.of(Card.values());
-            Card c=(cards.get(random.nextInt(cards.size())));
-            cardPanel.addPlayerCard(cards.get(random.nextInt(cards.size())));
+            Card c = cards.get(random.nextInt(cards.size()));
+            cardPanel.addPlayerCard(c);
             //To update the sum
-            playerSum+=c.getValue();
+            playerSum += c.getValue();
             if (c.isAce()){
                 playerAceCount++;
             }
+            playerSum = reducePlayerAce();
+            cardPanel.updateScores(playerSum, dealerSum);
             repaint(); 
             //Logic to block out hit and stand button after exceeding 21
-            if (reducePlayerAce()>21){
+            if (playerSum > 21){
                 hitButton.setEnabled(false);
+                standButton.setEnabled(false);
+                cardPanel.updateStatus("You Lose! - Bust");
             }
         });
+
         standButton.addActionListener(e -> {
             System.out.println("Stand button clicked");
-            List<Card> cards = List.of(Card.values());
-            Card d=(cards.get(random.nextInt(cards.size())));
-            cardPanel.addDealerCard(cards.get(random.nextInt(cards.size())));
-            //To update dealer sum
-            dealerSum+=d.getValue();
-            if(d.isAce()){
-                dealerAceCount++;
+            // Dealer's turn - keep drawing until 17 or higher
+            while (dealerSum < 17) {
+                List<Card> cards = List.of(Card.values());
+                Card d = cards.get(random.nextInt(cards.size()));
+                cardPanel.addDealerCard(d);
+                dealerSum += d.getValue();
+                if(d.isAce()){
+                    dealerAceCount++;
+                }
+                dealerSum = reduceDealerAce();
+                cardPanel.updateScores(playerSum, dealerSum);
+                repaint();
             }
-            repaint(); 
-            if (reduceDealerAce()>21){
-                standButton.setEnabled(false);
+            
+            // Determine winner
+            if (dealerSum > 21) {
+                cardPanel.updateStatus("You Win! - Dealer Bust");
+            } else if (dealerSum > playerSum) {
+                cardPanel.updateStatus("You Lose! - Dealer Wins");
+            } else if (dealerSum < playerSum) {
+                cardPanel.updateStatus("You Win! - Higher Score");
+            } else {
+                cardPanel.updateStatus("Push - It's a Tie!");
             }
+            hitButton.setEnabled(false);
+            standButton.setEnabled(false);
         });
 
         // client connecter to make API calls on the server
@@ -101,7 +138,64 @@ public class BlackjackGUI extends JFrame {
         
         addMenuBar();
         addKeyboardControls(); // Add keyboard controls
-    }    private void addKeyboardControls() {
+    }
+
+    private void dealInitialCards() {
+        List<Card> cards = List.of(Card.values());
+        
+        // Deal two cards to player
+        for (int i = 0; i < 2; i++) {
+            Card c = cards.get(random.nextInt(cards.size()));
+            cardPanel.addPlayerCard(c);
+            playerSum += c.getValue();
+            if (c.isAce()) {
+                playerAceCount++;
+            }
+        }
+        playerSum = reducePlayerAce();
+        
+        // Deal two cards to dealer
+        for (int i = 0; i < 2; i++) {
+            Card d = cards.get(random.nextInt(cards.size()));
+            cardPanel.addDealerCard(d);
+            dealerSum += d.getValue();
+            if (d.isAce()) {
+                dealerAceCount++;
+            }
+        }
+        dealerSum = reduceDealerAce();
+        
+        cardPanel.updateScores(playerSum, dealerSum);
+        
+        // Check for natural blackjack
+        if (playerSum == 21) {
+            cardPanel.updateStatus("Blackjack! You Win!");
+            hitButton.setEnabled(false);
+            standButton.setEnabled(false);
+        }
+    }
+
+    public int reducePlayerAce() {
+        int tempSum = playerSum;
+        int tempAceCount = playerAceCount;
+        while (tempSum > 21 && tempAceCount > 0) {
+            tempSum -= 10;
+            tempAceCount--;
+        }
+        return tempSum;
+    }
+
+    public int reduceDealerAce() {
+        int tempSum = dealerSum;
+        int tempAceCount = dealerAceCount;
+        while (tempSum > 21 && tempAceCount > 0) {
+            tempSum -= 10;
+            tempAceCount--;
+        }
+        return tempSum;
+    }
+
+    private void addKeyboardControls() {
         // Basic keyboard control
         KeyListener listener = new KeyListener() {
             @Override
@@ -213,22 +307,5 @@ public class BlackjackGUI extends JFrame {
     public static void main(String[] args) {
         BlackjackGUI gui = new BlackjackGUI();
         gui.setVisible(true);
-    }
-    public int reducePlayerAce(){
-        while(playerSum>21 && playerAceCount>0){
-            playerSum-=10;//cut 10 from balance when sum exceeds 21
-            playerAceCount-=1; //number of ace reduced
-        }
-        if (playerSum>21){
-            System.out.println("You lose!");
-        }
-            return playerSum;
-    } 
-    public int reduceDealerAce(){
-        while (dealerSum>21 && dealerAceCount>0){
-            dealerSum-=10;
-            dealerAceCount-=1;
-        }
-        return dealerSum;
     }
 }
